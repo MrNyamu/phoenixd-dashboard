@@ -1,0 +1,269 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { useRouter, usePathname } from 'next/navigation';
+import {
+  Home,
+  Zap,
+  TrendingUp,
+  Send,
+  Receipt,
+  Settings,
+  Menu,
+  X,
+  Wifi,
+  WifiOff,
+  AlertCircle,
+  CheckCircle,
+  Mail,
+  Wallet,
+  Link,
+  Server,
+  CreditCard
+} from 'lucide-react';
+
+const navigation = [
+  { name: 'Dashboard', href: '/', icon: Home },
+  { name: 'Payments', href: '/payments', icon: CreditCard },
+  { name: 'LNURL', href: '/lnurl', icon: Link },
+  { name: 'Node Manager', href: '/node', icon: Server },
+  { name: 'Lightning Address', href: '/lightning-address', icon: Mail },
+  { name: 'Settings', href: '/settings', icon: Settings },
+];
+
+interface AppLayoutProps {
+  children: React.ReactNode;
+}
+
+export default function AppLayout({ children }: AppLayoutProps) {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [connectionStatus, setConnectionStatus] = useState<'disconnected' | 'connecting' | 'connected' | 'error'>('connecting');
+  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
+  const pathname = usePathname();
+
+  useEffect(() => {
+    // Simulate connection attempt
+    const timer = setTimeout(() => {
+      setConnectionStatus('connected');
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  const ConnectionIndicator = () => {
+    const getStatusConfig = () => {
+      switch (connectionStatus) {
+        case 'connected':
+          return {
+            icon: CheckCircle,
+            color: 'text-green-500',
+            bg: 'bg-green-50 dark:bg-green-900/20',
+            text: 'Connected',
+          };
+        case 'connecting':
+          return {
+            icon: Wifi,
+            color: 'text-yellow-500',
+            bg: 'bg-yellow-50 dark:bg-yellow-900/20',
+            text: 'Connecting...',
+          };
+        case 'error':
+          return {
+            icon: AlertCircle,
+            color: 'text-red-500',
+            bg: 'bg-red-50 dark:bg-red-900/20',
+            text: 'Error',
+          };
+        default:
+          return {
+            icon: WifiOff,
+            color: 'text-gray-400',
+            bg: 'bg-gray-50 dark:bg-gray-900/20',
+            text: 'Disconnected',
+          };
+      }
+    };
+
+    const config = getStatusConfig();
+    const Icon = config.icon;
+
+    return (
+      <div className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-200 ${config.bg}`}>
+        <div className={connectionStatus === 'connecting' ? 'animate-spin' : ''}>
+          <Icon className={`w-4 h-4 ${config.color}`} />
+        </div>
+        <span className={`text-sm font-medium ${config.color}`}>
+          {config.text}
+        </span>
+      </div>
+    );
+  };
+
+  const Sidebar = ({ mobile = false }: { mobile?: boolean }) => (
+    <div className={`flex flex-col h-full ${mobile ? 'w-full' : 'w-64'}`}>
+      {/* Header */}
+      <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-800">
+        <div className="flex items-center gap-3">
+          <div className="relative">
+            <div className="w-8 h-8 bg-gradient-to-br from-orange-400 to-yellow-500 rounded-lg flex items-center justify-center">
+              <Zap className="w-5 h-5 text-white" />
+            </div>
+            {connectionStatus === 'connected' && (
+              <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-white dark:border-gray-900" />
+            )}
+          </div>
+          <div>
+            <h1 className="text-xl font-bold text-gray-900 dark:text-white">
+              PhoenixD
+            </h1>
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              Lightning Client
+            </p>
+          </div>
+        </div>
+        {mobile && (
+          <button
+            onClick={() => setSidebarOpen(false)}
+            className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        )}
+      </div>
+
+      {/* Connection Status */}
+      <div className="p-4 border-b border-gray-200 dark:border-gray-800">
+        <ConnectionIndicator />
+        {error && (
+          <div className="mt-2 p-2 bg-red-50 dark:bg-red-900/20 rounded-lg">
+            <p className="text-xs text-red-600 dark:text-red-400">{error}</p>
+          </div>
+        )}
+      </div>
+
+      {/* Balance */}
+      {connectionStatus === 'connected' && (
+        <div className="p-4 border-b border-gray-200 dark:border-gray-800">
+          <div className="text-center">
+            <p className="text-sm text-gray-500 dark:text-gray-400">Total Balance</p>
+            <p className="text-2xl font-bold text-gray-900 dark:text-white">
+              1,500,000 sats
+            </p>
+            <p className="text-xs text-green-600 dark:text-green-400">
+              +1,000 fee credits
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* Navigation */}
+      <nav className="flex-1 p-4 space-y-2">
+        {navigation.map((item, index) => {
+          const Icon = item.icon;
+          const isActive = pathname === item.href;
+
+          return (
+            <button
+              key={item.name}
+              onClick={() => {
+                router.push(item.href);
+                if (mobile) setSidebarOpen(false);
+              }}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 group ${
+                isActive
+                  ? 'bg-orange-100 dark:bg-orange-900/20 text-orange-700 dark:text-orange-300 shadow-sm'
+                  : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white'
+              }`}
+            >
+              <Icon className={`w-5 h-5 transition-colors duration-200 ${
+                isActive
+                  ? 'text-orange-700 dark:text-orange-300'
+                  : 'text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-300'
+              }`} />
+              <span className="font-medium">{item.name}</span>
+              {isActive && (
+                <div className="ml-auto w-2 h-2 bg-orange-500 rounded-full" />
+              )}
+            </button>
+          );
+        })}
+      </nav>
+
+      {/* Node Info */}
+      {connectionStatus === 'connected' && (
+        <div className="p-4 border-t border-gray-200 dark:border-gray-800">
+          <div className="text-center">
+            <p className="text-xs text-gray-500 dark:text-gray-400">Node ID</p>
+            <p className="text-xs font-mono text-gray-700 dark:text-gray-300 truncate">
+              0298f50dd9ea14b446c...
+            </p>
+            <div className="flex items-center justify-center gap-4 mt-2">
+              <div className="text-center">
+                <p className="text-xs text-gray-500 dark:text-gray-400">Block</p>
+                <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                  825,000
+                </p>
+              </div>
+              <div className="text-center">
+                <p className="text-xs text-gray-500 dark:text-gray-400">Channels</p>
+                <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                  3
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+
+  return (
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      {/* Mobile sidebar overlay */}
+      {sidebarOpen && (
+        <>
+          <div
+            className="fixed inset-0 z-40 bg-black bg-opacity-50 lg:hidden"
+            onClick={() => setSidebarOpen(false)}
+          />
+          <div className="fixed inset-y-0 left-0 z-50 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 lg:hidden transition-transform duration-300 ease-in-out">
+            <Sidebar mobile />
+          </div>
+        </>
+      )}
+
+      {/* Desktop sidebar */}
+      <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col">
+        <div className="flex-1 flex flex-col bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800">
+          <Sidebar />
+        </div>
+      </div>
+
+      {/* Main content */}
+      <div className="lg:pl-64">
+        {/* Mobile header */}
+        <div className="lg:hidden">
+          <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900">
+            <button
+              onClick={() => setSidebarOpen(true)}
+              className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+            >
+              <Menu className="w-6 h-6" />
+            </button>
+            <div className="flex items-center gap-2">
+              <ConnectionIndicator />
+            </div>
+          </div>
+        </div>
+
+        {/* Page content */}
+        <main className="flex-1">
+          <div className="p-6">
+            {children}
+          </div>
+        </main>
+      </div>
+    </div>
+  );
+}

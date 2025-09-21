@@ -1,0 +1,8 @@
+{
+  "domain": "localhost:3000",
+  "enabled": true,
+  "defaultMinSendable": 1,
+  "defaultMaxSendable": 100000,
+  "allowComments": true,
+  "maxCommentLength": 144
+}

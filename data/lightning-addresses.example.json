@@ -1,0 +1,18 @@
+[
+  {
+    "address": "admin@yourdomain.com",
+    "username": "admin",
+    "domain": "yourdomain.com",
+    "metadata": {
+      "description": "Example Lightning address for admin",
+      "avatar": "",
+      "minSendable": 1000,
+      "maxSendable": 100000000,
+      "allowsNostr": false,
+      "callback": "https://yourdomain.com/api/lightning-address/callback",
+      "metadata": "[[\"text/plain\",\"Payment to admin@yourdomain.com\"],[\"text/long-desc\",\"Example Lightning address configuration\"]]"
+    },
+    "enabled": true,
+    "createdAt": 1640995200000
+  }
+]
