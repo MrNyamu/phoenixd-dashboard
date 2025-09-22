@@ -10,7 +10,7 @@ import {
   Shield,
   CheckCircle,
   Sparkles,
-  Lightning,
+  Bolt,
   Globe,
   Users,
   Clock,
@@ -40,7 +40,7 @@ export default function OnboardingModal({ isOpen, onClose, onStartFunding, hasCh
         <div className="space-y-6">
           <div className="text-center">
             <div className="w-20 h-20 bg-gradient-to-br from-orange-400 to-yellow-500 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Lightning className="w-10 h-10 text-white" />
+              <Bolt className="w-10 h-10 text-white" />
             </div>
             <p className="text-gray-600 dark:text-gray-400 text-lg leading-relaxed">
               Phoenix is a non-custodial Lightning wallet that automatically manages channels for you.

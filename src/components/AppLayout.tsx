@@ -114,7 +114,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
   const Sidebar = ({ mobile = false }: { mobile?: boolean }) => (
     <div className={`flex flex-col h-full ${mobile ? 'w-full' : 'w-64'}`}>
       {/* Header */}
-      <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-800">
+      <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200 dark:border-gray-800">
         <div className="flex items-center gap-3">
           <div className="relative">
             <div className="w-8 h-8 bg-gradient-to-br from-orange-400 to-yellow-500 rounded-lg flex items-center justify-center">
@@ -125,7 +125,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
             )}
           </div>
           <div>
-            <h1 className="text-xl font-bold text-gray-900 dark:text-white">
+            <h1 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
               PhoenixD
             </h1>
             <p className="text-xs text-gray-500 dark:text-gray-400">
@@ -136,7 +136,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
         {mobile && (
           <button
             onClick={() => setSidebarOpen(false)}
-            className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+            className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 touch-manipulation"
           >
             <X className="w-5 h-5" />
           </button>
@@ -144,7 +144,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
       </div>
 
       {/* Connection Status */}
-      <div className="p-4 border-b border-gray-200 dark:border-gray-800">
+      <div className="p-3 sm:p-4 border-b border-gray-200 dark:border-gray-800">
         <ConnectionIndicator />
         {error && (
           <div className="mt-2 p-2 bg-red-50 dark:bg-red-900/20 rounded-lg">
@@ -155,15 +155,15 @@ export default function AppLayout({ children }: AppLayoutProps) {
 
       {/* Balance */}
       {connectionStatus === 'connected' && store.balance && (
-        <div className="p-4 border-b border-gray-200 dark:border-gray-800">
+        <div className="p-3 sm:p-4 border-b border-gray-200 dark:border-gray-800">
           <div className="text-center">
             <p className="text-sm text-gray-500 dark:text-gray-400">Total Balance</p>
-            <p className="text-2xl font-bold text-gray-900 dark:text-white">
-              {store.balance.balanceSat.toLocaleString()} sats
+            <p className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white break-all">
+              {Math.floor((store.balance.balanceMsat || 0) / 1000).toLocaleString()} sats
             </p>
-            {store.balance.feeCreditSat > 0 && (
+            {(store.balance.feeCreditMsat || 0) > 0 && (
               <p className="text-xs text-green-600 dark:text-green-400">
-                +{store.balance.feeCreditSat.toLocaleString()} fee credits
+                +{Math.floor((store.balance.feeCreditMsat || 0) / 1000).toLocaleString()} fee credits
               </p>
             )}
           </div>
@@ -171,7 +171,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
       )}
 
       {/* Navigation */}
-      <nav className="flex-1 p-4 space-y-2">
+      <nav className="flex-1 p-3 sm:p-4 space-y-2">
         {navigation.map((item, index) => {
           const Icon = item.icon;
           const isActive = pathname === item.href;
@@ -183,7 +183,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
                 router.push(item.href);
                 if (mobile) setSidebarOpen(false);
               }}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 group ${
+              className={`w-full flex items-center gap-3 px-3 sm:px-4 py-3 rounded-lg transition-all duration-200 group touch-manipulation ${
                 isActive
                   ? 'bg-orange-100 dark:bg-orange-900/20 text-orange-700 dark:text-orange-300 shadow-sm'
                   : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white'
@@ -194,7 +194,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
                   ? 'text-orange-700 dark:text-orange-300'
                   : 'text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-300'
               }`} />
-              <span className="font-medium">{item.name}</span>
+              <span className="font-medium text-sm sm:text-base">{item.name}</span>
               {isActive && (
                 <div className="ml-auto w-2 h-2 bg-orange-500 rounded-full" />
               )}
@@ -205,10 +205,10 @@ export default function AppLayout({ children }: AppLayoutProps) {
 
       {/* Node Info */}
       {connectionStatus === 'connected' && store.nodeInfo && (
-        <div className="p-4 border-t border-gray-200 dark:border-gray-800">
+        <div className="p-3 sm:p-4 border-t border-gray-200 dark:border-gray-800">
           <div className="text-center">
             <p className="text-xs text-gray-500 dark:text-gray-400">Node ID</p>
-            <p className="text-xs font-mono text-gray-700 dark:text-gray-300 truncate">
+            <p className="text-xs font-mono text-gray-700 dark:text-gray-300 truncate break-all">
               {store.nodeInfo.nodeId ? (process.env.NEXT_PUBLIC_DUMMY_NODE_ID || '02ab3c4d5e6f7890123456789abcdef1234567890abcdef1234567890abcdef12').substring(0, 20) + '...' : 'N/A'}
             </p>
             <div className="flex items-center justify-center gap-4 mt-2">
@@ -235,7 +235,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Mobile sidebar */}
       {sidebarOpen && (
-        <div className="fixed inset-y-0 left-0 z-50 w-80 max-w-xs bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 lg:hidden transition-transform duration-300 ease-in-out transform overflow-y-auto shadow-xl">
+        <div className="fixed inset-y-0 left-0 z-50 w-full max-w-sm bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 lg:hidden transition-transform duration-300 ease-in-out transform overflow-y-auto shadow-xl">
           <Sidebar mobile />
         </div>
       )}
@@ -251,22 +251,38 @@ export default function AppLayout({ children }: AppLayoutProps) {
       <div className={`lg:pl-64 transition-all duration-300 ${sidebarOpen ? 'lg:opacity-100 opacity-50' : 'opacity-100'}`}>
         {/* Mobile header */}
         <div className="lg:hidden">
-          <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900">
+          <div className="flex items-center justify-between p-3 sm:p-4 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900">
             <button
               onClick={() => setSidebarOpen(true)}
-              className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+              className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 touch-manipulation"
             >
               <Menu className="w-6 h-6" />
             </button>
-            <div className="flex items-center gap-2">
-              <ConnectionIndicator />
+            <div className="flex items-center gap-1 sm:gap-2">
+              {/* Compact connection indicator for mobile */}
+              <div className={`flex items-center gap-1 px-2 py-1 rounded-lg transition-all duration-200 ${connectionStatus === 'connected' ? 'bg-green-50 dark:bg-green-900/20' : connectionStatus === 'error' ? 'bg-red-50 dark:bg-red-900/20' : 'bg-gray-50 dark:bg-gray-900/20'}`}>
+                <div className={connectionStatus === 'connecting' ? 'animate-spin' : ''}>
+                  {connectionStatus === 'connected' ? (
+                    <CheckCircle className="w-3 h-3 text-green-500" />
+                  ) : connectionStatus === 'error' ? (
+                    <AlertCircle className="w-3 h-3 text-red-500" />
+                  ) : connectionStatus === 'connecting' ? (
+                    <Wifi className="w-3 h-3 text-yellow-500" />
+                  ) : (
+                    <WifiOff className="w-3 h-3 text-gray-400" />
+                  )}
+                </div>
+                <span className={`text-xs font-medium hidden xs:inline ${connectionStatus === 'connected' ? 'text-green-500' : connectionStatus === 'error' ? 'text-red-500' : connectionStatus === 'connecting' ? 'text-yellow-500' : 'text-gray-400'}`}>
+                  {connectionStatus === 'connected' ? 'Connected' : connectionStatus === 'error' ? 'Error' : connectionStatus === 'connecting' ? 'Connecting' : 'Offline'}
+                </span>
+              </div>
             </div>
           </div>
         </div>
 
         {/* Page content */}
         <main className="flex-1">
-          <div className="p-6">
+          <div className="p-3 sm:p-4 lg:p-6">
             {children}
           </div>
         </main>
@@ -275,7 +291,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
       {/* Overlay to close sidebar on mobile */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 z-40 lg:hidden"
+          className="fixed inset-0 z-40 lg:hidden bg-black bg-opacity-50 touch-manipulation"
           onClick={() => setSidebarOpen(false)}
         />
       )}

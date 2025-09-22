@@ -371,7 +371,7 @@ export default function NodeManager() {
                 Network
               </label>
               <p className="text-sm text-gray-900 dark:text-white bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
-                {nodeInfo.chain || 'N/A'}
+                {nodeInfo?.chain || 'N/A'}
               </p>
             </div>
 

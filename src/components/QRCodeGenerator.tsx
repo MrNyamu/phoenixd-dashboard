@@ -143,7 +143,7 @@ export default function QRCodeGenerator({
           animate={{ opacity: 1 }}
           src={qrCodeDataUrl}
           alt="QR Code"
-          className="rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 bg-white p-4"
+          className="rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 bg-white p-2 sm:p-4"
           width={size}
           height={size}
         />
@@ -193,7 +193,7 @@ export default function QRCodeGenerator({
 
       {/* Action buttons */}
       {showActions && (
-        <div className="flex gap-2 mt-4">
+        <div className="flex flex-col sm:flex-row gap-2 mt-4">
           <button
             onClick={handleCopy}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${

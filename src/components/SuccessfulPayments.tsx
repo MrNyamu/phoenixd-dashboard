@@ -322,15 +322,15 @@ const SuccessfulPayments = () => {
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => setShowFilters(!showFilters)}
-            className="flex items-center gap-2 px-4 py-2 text-gray-600 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700"
+            className="flex items-center gap-2 px-3 sm:px-4 py-2 text-gray-600 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 touch-manipulation text-sm sm:text-base"
           >
             <Filter className="w-4 h-4" />
-            Filters
+            <span className="hidden sm:inline">Filters</span>
           </motion.button>
 
           <motion.button
@@ -338,10 +338,10 @@ const SuccessfulPayments = () => {
             whileTap={{ scale: 0.95 }}
             onClick={fetchSuccessfulPayments}
             disabled={loading}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50"
+            className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 touch-manipulation text-sm sm:text-base"
           >
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-            Refresh
+            <span className="hidden sm:inline">Refresh</span>
           </motion.button>
 
           <motion.button
@@ -349,17 +349,17 @@ const SuccessfulPayments = () => {
             whileTap={{ scale: 0.95 }}
             onClick={exportToCSV}
             disabled={exporting || filteredPayments.length === 0}
-            className="flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 disabled:opacity-50"
+            className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 disabled:opacity-50 touch-manipulation text-sm sm:text-base"
           >
             {exporting ? (
               <>
                 <RefreshCw className="w-4 h-4 animate-spin" />
-                Exporting...
+                <span className="hidden sm:inline">Exporting...</span>
               </>
             ) : (
               <>
                 <Download className="w-4 h-4" />
-                Export CSV
+                <span className="hidden sm:inline">Export CSV</span>
               </>
             )}
           </motion.button>
@@ -372,7 +372,7 @@ const SuccessfulPayments = () => {
         animate="animate"
         variants={animationVariants.slideUp}
         transition={{ delay: 0.1 }}
-        className="grid grid-cols-1 md:grid-cols-4 gap-4"
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"
       >
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
           <div className="flex items-center justify-between">
@@ -426,7 +426,7 @@ const SuccessfulPayments = () => {
           >
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Filter Payments</h3>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   From Date
