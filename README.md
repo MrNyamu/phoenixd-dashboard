@@ -1,5 +1,7 @@
 # PhoenixD Client
 
+![PhoenixD Dashboard Screenshot](./docs/dashboard-screenshot.png)
+
 A modern, feature-rich web interface for managing your PhoenixD Lightning Network node. Built with Next.js, TypeScript, and Tailwind CSS, this client provides an intuitive dashboard for monitoring node activity, managing Lightning channels, creating invoices, and handling payments.
 
 ## ✨ Features
