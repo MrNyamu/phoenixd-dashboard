@@ -193,6 +193,92 @@ export const usePhoenixData = () => {
     }
   }, [store]);
 
+  const fetchIncomingPayments = useCallback(async () => {
+    try {
+      const response = await fetch('/api/phoenixd/payments/incoming');
+
+      if (response.ok) {
+        const incomingPayments = await response.json();
+        console.log('📥 Fetched incoming payments:', incomingPayments.length);
+
+        // Add incoming payments to store as transactions
+        incomingPayments.forEach((payment: any) => {
+          if (payment.isPaid) {
+            const transaction = {
+              paymentHash: payment.paymentHash,
+              paymentPreimage: payment.preimage,
+              amountMsat: payment.receivedSat * 1000,
+              description: payment.description || '',
+              createdAt: Math.floor(payment.createdAt / 1000), // Convert to seconds
+              status: 'completed' as const,
+              type: 'incoming_payment' as const,
+              invoice: payment.invoice,
+              expiresAt: payment.expiresAt ? Math.floor(payment.expiresAt / 1000) : undefined,
+              completedAt: payment.completedAt ? Math.floor(payment.completedAt / 1000) : undefined,
+              fees: payment.fees || 0,
+            };
+            store.addInvoice(transaction);
+          }
+        });
+      }
+    } catch (error: any) {
+      console.error('Failed to fetch incoming payments:', error);
+    }
+  }, [store]);
+
+  const fetchChannelActivity = useCallback(async () => {
+    try {
+      // Monitor for channel events and activity
+      const response = await fetch('/api/phoenixd/listchannels');
+
+      if (response.ok) {
+        const channels = await response.json();
+        const currentTime = Date.now();
+
+        // Check for channel state changes
+        const previousChannels = store.channels;
+        const newChannels = channels;
+
+        // Detect new channels
+        const newChannelIds = newChannels
+          .filter((newCh: any) => !previousChannels.find((oldCh: any) => oldCh.channelId === newCh.channelId))
+          .map((ch: any) => ch.channelId);
+
+        if (newChannelIds.length > 0) {
+          console.log('🎉 New channels detected:', newChannelIds);
+          // You could trigger notifications here
+        }
+
+        // Detect channel state changes
+        newChannels.forEach((newCh: any) => {
+          const oldCh = previousChannels.find((old: any) => old.channelId === newCh.channelId);
+          if (oldCh && oldCh.state !== newCh.state) {
+            console.log(`🔄 Channel ${newCh.channelId} state changed: ${oldCh.state} → ${newCh.state}`);
+          }
+        });
+
+        // Update channels in store
+        store.setChannels(newChannels);
+
+        // Create activity log entry for significant events
+        if (newChannelIds.length > 0) {
+          const activityEntry = {
+            id: `channel_${currentTime}`,
+            type: 'channel_opened',
+            timestamp: currentTime,
+            data: { channelIds: newChannelIds },
+            message: `${newChannelIds.length} new channel(s) opened`,
+          };
+
+          // You could add this to a channel activity store
+          console.log('📊 Channel activity:', activityEntry);
+        }
+      }
+    } catch (error: any) {
+      console.error('Failed to fetch channel activity:', error);
+    }
+  }, [store]);
+
   const refreshAll = useCallback(async () => {
     await Promise.all([
       fetchNodeInfo(),
@@ -200,8 +286,10 @@ export const usePhoenixData = () => {
       fetchChannels(),
       fetchPayments({ count: 50 }),
       fetchInvoices({ count: 50 }),
+      fetchIncomingPayments(),
+      fetchChannelActivity(),
     ]);
-  }, [fetchNodeInfo, fetchBalance, fetchChannels, fetchPayments, fetchInvoices]);
+  }, [fetchNodeInfo, fetchBalance, fetchChannels, fetchPayments, fetchInvoices, fetchIncomingPayments, fetchChannelActivity]);
 
   return {
     fetchNodeInfo,
@@ -209,6 +297,8 @@ export const usePhoenixData = () => {
     fetchChannels,
     fetchPayments,
     fetchInvoices,
+    fetchIncomingPayments,
+    fetchChannelActivity,
     refreshAll,
     isLoading: store.isLoading,
   };

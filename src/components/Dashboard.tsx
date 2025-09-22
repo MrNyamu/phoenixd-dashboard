@@ -45,6 +45,8 @@ import { usePaymentOperations } from '@/hooks/usePhoenix';
 import { formatSats, formatRelativeTime, cn, animationVariants, copyToClipboard } from '@/lib/utils';
 import QRCodeGenerator from './QRCodeGenerator';
 import SuccessfulPayments from './SuccessfulPayments';
+import TransactionDetails from './TransactionDetails';
+import OnboardingModal from './OnboardingModal';
 
 const Dashboard = () => {
   const [balanceVisible, setBalanceVisible] = useState(true);
@@ -58,6 +60,14 @@ const Dashboard = () => {
   const [generatedInvoice, setGeneratedInvoice] = useState<any>(null);
   const [showQRModal, setShowQRModal] = useState(false);
   const [copyFeedback, setCopyFeedback] = useState('');
+
+  // Transaction details state
+  const [selectedTransaction, setSelectedTransaction] = useState<any>(null);
+  const [showTransactionDetails, setShowTransactionDetails] = useState(false);
+
+  // Onboarding state
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [hasSeenOnboarding, setHasSeenOnboarding] = useState(false);
 
   const { balance, nodeInfo, liquiditySnapshots, isConnected } = usePhoenixStore();
   const channelStats = useChannelStats();
@@ -96,11 +106,62 @@ const Dashboard = () => {
     }
   };
 
+  const handleTransactionClick = (transaction: any) => {
+    // Convert transaction to the format expected by TransactionDetails
+    const detailedTransaction = {
+      paymentId: transaction.paymentId || `tx_${transaction.paymentHash.slice(0, 8)}`,
+      paymentHash: transaction.paymentHash,
+      paymentPreimage: transaction.paymentPreimage,
+      recipientAmountSat: transaction.recipientAmountMsat ? transaction.recipientAmountMsat / 1000 :
+                          transaction.amountMsat ? transaction.amountMsat / 1000 : 0,
+      routingFeeSat: transaction.routingFeeSat || transaction.fees || 4, // Default to 4 sats if not available
+      amountMsat: transaction.amountMsat || transaction.recipientAmountMsat,
+      description: transaction.description || '',
+      createdAt: transaction.createdAt,
+      status: transaction.status,
+      type: 'recipientAmountMsat' in transaction ? 'sent' : 'received',
+      invoice: transaction.invoice,
+      expiresAt: transaction.expiresAt
+    };
+
+    setSelectedTransaction(detailedTransaction);
+    setShowTransactionDetails(true);
+  };
+
   useEffect(() => {
     if (isConnected) {
       refreshAll();
     }
   }, [isConnected, refreshAll]);
+
+  // Check for first-time user and show onboarding
+  useEffect(() => {
+    if (isConnected && !hasSeenOnboarding) {
+      // Check if user has seen onboarding before
+      const seenOnboarding = localStorage.getItem('phoenixd-onboarding-seen');
+
+      if (!seenOnboarding) {
+        // Check if user has channels - if not, show onboarding
+        if (channelStats.channelCount === 0 && balance?.balanceMsat === 0) {
+          setShowOnboarding(true);
+        }
+      } else {
+        setHasSeenOnboarding(true);
+      }
+    }
+  }, [isConnected, hasSeenOnboarding, channelStats.channelCount, balance?.balanceMsat]);
+
+  const handleOnboardingComplete = () => {
+    localStorage.setItem('phoenixd-onboarding-seen', 'true');
+    setHasSeenOnboarding(true);
+    setShowOnboarding(false);
+  };
+
+  const handleStartFunding = () => {
+    handleOnboardingComplete();
+    // Navigate to channel manager or trigger funding flow
+    window.location.href = '/node'; // Navigate to channel manager
+  };
 
   // Chart data
   const liquidityChartData = liquiditySnapshots.slice(-24).map((snapshot, index) => ({
@@ -597,7 +658,8 @@ const Dashboard = () => {
                       animate={{ opacity: 1, x: 0 }}
                       exit={{ opacity: 0, x: 20 }}
                       transition={{ delay: index * 0.05 }}
-                      className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg"
+                      onClick={() => handleTransactionClick(transaction)}
+                      className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-200"
                     >
                       <div className="flex items-center gap-3">
                         <div className={cn(
@@ -777,6 +839,21 @@ const Dashboard = () => {
           <span className="text-sm">Auto-refresh enabled</span>
         </motion.div>
       )}
+
+      {/* Transaction Details Modal */}
+      <TransactionDetails
+        transaction={selectedTransaction}
+        isOpen={showTransactionDetails}
+        onClose={() => setShowTransactionDetails(false)}
+      />
+
+      {/* Onboarding Modal */}
+      <OnboardingModal
+        isOpen={showOnboarding}
+        onClose={handleOnboardingComplete}
+        onStartFunding={handleStartFunding}
+        hasChannels={channelStats.channelCount > 0}
+      />
     </div>
   );
 };

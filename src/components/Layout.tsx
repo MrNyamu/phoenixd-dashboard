@@ -249,7 +249,7 @@ export default function Layout({ children }: LayoutProps) {
           <div className="text-center">
             <p className="text-xs text-gray-500 dark:text-gray-400">Node ID</p>
             <p className="text-xs font-mono text-gray-700 dark:text-gray-300 truncate">
-              {nodeInfo.nodeId.slice(0, 16)}...
+              {(process.env.NEXT_PUBLIC_DUMMY_NODE_ID || '02ab3c4d5e6f7890123456789abcdef1234567890abcdef1234567890abcdef12').slice(0, 16)}...
             </p>
             <div className="flex items-center justify-center gap-4 mt-2">
               <div className="text-center">

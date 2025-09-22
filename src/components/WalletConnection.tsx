@@ -86,7 +86,7 @@ export default function WalletConnection() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
-  const [testAmount, setTestAmount] = useState(1000);
+  const [testAmount, setTestAmount] = useState(0);
 
   const addUserWallet = () => {
     if (!newNodeId.trim()) {

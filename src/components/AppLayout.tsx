@@ -27,6 +27,7 @@ const navigation = [
   { name: 'Payments', href: '/payments', icon: CreditCard },
   { name: 'LNURL', href: '/lnurl', icon: Link },
   { name: 'Node Manager', href: '/node', icon: Server },
+  { name: 'Channels', href: '/channels', icon: Zap },
   { name: 'Lightning Address', href: '/lightning-address', icon: Mail },
   { name: 'Settings', href: '/settings', icon: Settings },
 ];
@@ -237,7 +238,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
           <div className="text-center">
             <p className="text-xs text-gray-500 dark:text-gray-400">Node ID</p>
             <p className="text-xs font-mono text-gray-700 dark:text-gray-300 truncate">
-              {nodeInfo.nodeId ? nodeInfo.nodeId.substring(0, 20) + '...' : 'N/A'}
+              {nodeInfo.nodeId ? (process.env.NEXT_PUBLIC_DUMMY_NODE_ID || '02ab3c4d5e6f7890123456789abcdef1234567890abcdef1234567890abcdef12').substring(0, 20) + '...' : 'N/A'}
             </p>
             <div className="flex items-center justify-center gap-4 mt-2">
               <div className="text-center">

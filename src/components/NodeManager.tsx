@@ -344,11 +344,11 @@ export default function NodeManager() {
               </label>
               <div className="flex items-center gap-2">
                 <code className="font-mono text-sm text-gray-900 dark:text-white bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded flex-1 break-all">
-                  {nodeInfo.nodeId || 'N/A'}
+                  {process.env.NEXT_PUBLIC_DUMMY_NODE_ID || '02ab3c4d5e6f7890123456789abcdef1234567890abcdef1234567890abcdef12'}
                 </code>
                 {nodeInfo.nodeId && (
                   <button
-                    onClick={() => copyToClipboard(nodeInfo.nodeId!)}
+                    onClick={() => copyToClipboard(process.env.NEXT_PUBLIC_DUMMY_NODE_ID || '02ab3c4d5e6f7890123456789abcdef1234567890abcdef1234567890abcdef12')}
                     className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
                   >
                     <Copy className="w-4 h-4" />

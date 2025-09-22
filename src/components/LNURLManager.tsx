@@ -86,7 +86,7 @@ export default function LNURLManager() {
 
   // LNURL-pay state
   const [lnurlToPay, setLnurlToPay] = useState('');
-  const [payAmount, setPayAmount] = useState(1000);
+  const [payAmount, setPayAmount] = useState(0);
   const [lnurlPayInfo, setLnurlPayInfo] = useState<LNURLPayRequest | null>(null);
   const [payingLnurl, setPayingLnurl] = useState(false);
 
@@ -96,7 +96,7 @@ export default function LNURLManager() {
 
   // Lightning Address state
   const [lightningAddress, setLightningAddress] = useState('');
-  const [addressAmount, setAddressAmount] = useState(1000);
+  const [addressAmount, setAddressAmount] = useState(0);
   const [payingAddress, setPayingAddress] = useState(false);
 
   const payLNURL = async () => {

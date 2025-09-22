@@ -95,7 +95,7 @@ export default function PaymentManager() {
   const [sendingPayment, setSendingPayment] = useState(false);
 
   // Receive payment state
-  const [receiveAmount, setReceiveAmount] = useState(1000);
+  const [receiveAmount, setReceiveAmount] = useState(0);
   const [receiveDescription, setReceiveDescription] = useState('');
   const [generatedInvoice, setGeneratedInvoice] = useState<string>('');
   const [creatingInvoice, setCreatingInvoice] = useState(false);

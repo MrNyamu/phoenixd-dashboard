@@ -224,7 +224,7 @@ export default function RealDashboard() {
 
   // Invoice creation state
   const [showInvoiceForm, setShowInvoiceForm] = useState(false);
-  const [invoiceAmount, setInvoiceAmount] = useState(1000);
+  const [invoiceAmount, setInvoiceAmount] = useState(0);
   const [invoiceDescription, setInvoiceDescription] = useState('');
   const [creatingInvoice, setCreatingInvoice] = useState(false);
   const [createdInvoice, setCreatedInvoice] = useState<Invoice | null>(null);
@@ -408,7 +408,7 @@ export default function RealDashboard() {
             <div>
               <p className="text-sm text-gray-600 dark:text-gray-400">Node ID</p>
               <p className="font-mono text-sm text-gray-900 dark:text-white break-all">
-                {nodeInfo.nodeId || 'N/A'}
+                {process.env.NEXT_PUBLIC_DUMMY_NODE_ID || '02ab3c4d5e6f7890123456789abcdef1234567890abcdef1234567890abcdef12'}
               </p>
             </div>
             <div>
