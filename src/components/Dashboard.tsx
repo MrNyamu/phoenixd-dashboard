@@ -36,16 +36,20 @@ import {
   Plus,
   QrCode,
   Copy,
+  CheckCircle,
+  BarChart3,
 } from 'lucide-react';
 import { usePhoenixStore, useChannelStats, useRecentTransactions } from '@/stores/usePhoenixStore';
 import { usePhoenixData, useAutoRefresh } from '@/hooks/usePhoenix';
 import { usePaymentOperations } from '@/hooks/usePhoenix';
 import { formatSats, formatRelativeTime, cn, animationVariants, copyToClipboard } from '@/lib/utils';
 import QRCodeGenerator from './QRCodeGenerator';
+import SuccessfulPayments from './SuccessfulPayments';
 
 const Dashboard = () => {
   const [balanceVisible, setBalanceVisible] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [activeTab, setActiveTab] = useState<'overview' | 'payments'>('overview');
 
   // Invoice creation state
   const [showQuickInvoice, setShowQuickInvoice] = useState(false);
@@ -219,7 +223,7 @@ const Dashboard = () => {
         <div>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
           <p className="text-gray-600 dark:text-gray-400 mt-1">
-            Monitor your Lightning node activity and liquidity
+            Monitor your Lightning node activity and manage payments
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -249,7 +253,48 @@ const Dashboard = () => {
         </div>
       </motion.div>
 
-      {/* Stats Grid */}
+      {/* Tab Navigation */}
+      <motion.div
+        initial="initial"
+        animate="animate"
+        variants={animationVariants.slideUp}
+        transition={{ delay: 0.1 }}
+        className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700"
+      >
+        <div className="border-b border-gray-200 dark:border-gray-700">
+          <nav className="-mb-px flex">
+            <button
+              onClick={() => setActiveTab('overview')}
+              className={cn(
+                'flex items-center gap-2 px-6 py-4 text-sm font-medium border-b-2 transition-colors',
+                activeTab === 'overview'
+                  ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
+              )}
+            >
+              <BarChart3 className="w-4 h-4" />
+              Overview
+            </button>
+            <button
+              onClick={() => setActiveTab('payments')}
+              className={cn(
+                'flex items-center gap-2 px-6 py-4 text-sm font-medium border-b-2 transition-colors',
+                activeTab === 'payments'
+                  ? 'border-green-500 text-green-600 dark:text-green-400'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
+              )}
+            >
+              <CheckCircle className="w-4 h-4" />
+              Successful Payments
+            </button>
+          </nav>
+        </div>
+      </motion.div>
+
+      {/* Tab Content */}
+      {activeTab === 'overview' && (
+        <div className="space-y-6">
+          {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard
           title="Total Balance"
@@ -700,6 +745,21 @@ const Dashboard = () => {
           </motion.div>
         )}
       </AnimatePresence>
+
+        </div>
+      )}
+
+      {/* Successful Payments Tab */}
+      {activeTab === 'payments' && (
+        <motion.div
+          initial="initial"
+          animate="animate"
+          variants={animationVariants.slideUp}
+          transition={{ delay: 0.2 }}
+        >
+          <SuccessfulPayments />
+        </motion.div>
+      )}
 
       {/* Auto-refresh indicator */}
       {autoRefresh && (

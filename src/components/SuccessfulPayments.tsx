@@ -552,7 +552,7 @@ const SuccessfulPayments = () => {
                           {payment.description}
                         </p>
                         <p className="text-xs text-gray-500 dark:text-gray-400">
-                          {formatRelativeTime(payment.timestamp)}
+                          {formatRelativeTime(new Date(payment.timestamp).getTime())}
                         </p>
                       </div>
                     </div>
