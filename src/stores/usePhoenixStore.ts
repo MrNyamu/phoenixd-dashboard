@@ -103,8 +103,8 @@ export const usePhoenixStore = create<PhoenixStore>()(
     metrics: null,
 
     notifications: initialNotifications,
-    autoRefresh: true,
-    refreshInterval: 30000, // 30 seconds
+    autoRefresh: false, // Disable by default to reduce API calls
+    refreshInterval: 60000, // 1 minute
     theme: 'auto',
 
     lastUpdate: 0,

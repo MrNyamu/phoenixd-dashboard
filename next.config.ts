@@ -9,6 +9,22 @@ const nextConfig: NextConfig = {
     optimizePackageImports: ['lucide-react', 'recharts', 'framer-motion'],
   },
 
+  // Turbopack configuration
+  turbopack: {
+    root: __dirname,
+    resolveAlias: {
+      '@vercel/turbopack-next/internal/font/google/font': 'next/dist/compiled/@next/font/dist/google/index.js',
+    },
+    rules: {
+      '*.{woff,woff2,eot,ttf,otf}': {
+        loaders: ['file-loader'],
+        options: {
+          name: '[name].[ext]',
+        },
+      },
+    },
+  },
+
   // Environment variable configuration
   env: {
     NEXT_PUBLIC_PHOENIXD_URL: process.env.NEXT_PUBLIC_PHOENIXD_URL,

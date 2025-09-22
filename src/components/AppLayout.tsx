@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
+import { usePhoenixStore } from '@/stores/usePhoenixStore';
+import { usePhoenixConnection, usePhoenixData } from '@/hooks/usePhoenix';
 import {
   Home,
   Zap,
@@ -38,58 +40,27 @@ interface AppLayoutProps {
 
 export default function AppLayout({ children }: AppLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [connectionStatus, setConnectionStatus] = useState<'disconnected' | 'connecting' | 'connected' | 'error'>('connecting');
-  const [error, setError] = useState<string | null>(null);
-  const [balance, setBalance] = useState<{ balanceSat: number; feeCreditSat: number } | null>(null);
-  const [nodeInfo, setNodeInfo] = useState<{ nodeId: string; blockHeight: number; channels: any[] } | null>(null);
   const router = useRouter();
   const pathname = usePathname();
 
+  // Use Phoenix store for consistent data across components
+  const store = usePhoenixStore();
+  const { connect, connectionStatus, error } = usePhoenixConnection();
+  const { refreshAll } = usePhoenixData();
+
   useEffect(() => {
-    // Check actual Phoenix connection
-    const checkConnection = async () => {
-      try {
-        setConnectionStatus('connecting');
+    // Initialize Phoenix connection (non-blocking)
+    connect().catch(console.error);
 
-        // Fetch node info
-        const infoResponse = await fetch('/api/phoenixd/getinfo');
-        if (infoResponse.ok) {
-          const info = await infoResponse.json();
-          setNodeInfo(info);
-          setConnectionStatus('connected');
-          setError(null);
-
-          // Fetch balance
-          try {
-            const balanceResponse = await fetch('/api/phoenixd/getbalance');
-            if (balanceResponse.ok) {
-              const balanceData = await balanceResponse.json();
-              setBalance(balanceData);
-            }
-          } catch (err) {
-            console.warn('Balance fetch failed:', err);
-          }
-        } else {
-          setConnectionStatus('error');
-          setError('Failed to connect to PhoenixD');
-          setNodeInfo(null);
-          setBalance(null);
-        }
-      } catch (err) {
-        setConnectionStatus('error');
-        setError('PhoenixD is not available');
-        setNodeInfo(null);
-        setBalance(null);
+    // Reduce frequency - Check connection every 2 minutes only if disconnected
+    const interval = setInterval(() => {
+      if (connectionStatus !== 'connected') {
+        connect().catch(console.error);
       }
-    };
-
-    checkConnection();
-
-    // Check connection every 30 seconds
-    const interval = setInterval(checkConnection, 30000);
+    }, 120000); // 2 minutes
 
     return () => clearInterval(interval);
-  }, []);
+  }, []); // Remove dependencies to prevent infinite loops
 
   const ConnectionIndicator = () => {
     const getStatusConfig = () => {
@@ -183,16 +154,16 @@ export default function AppLayout({ children }: AppLayoutProps) {
       </div>
 
       {/* Balance */}
-      {connectionStatus === 'connected' && balance && (
+      {connectionStatus === 'connected' && store.balance && (
         <div className="p-4 border-b border-gray-200 dark:border-gray-800">
           <div className="text-center">
             <p className="text-sm text-gray-500 dark:text-gray-400">Total Balance</p>
             <p className="text-2xl font-bold text-gray-900 dark:text-white">
-              {balance.balanceSat.toLocaleString()} sats
+              {store.balance.balanceSat.toLocaleString()} sats
             </p>
-            {balance.feeCreditSat > 0 && (
+            {store.balance.feeCreditSat > 0 && (
               <p className="text-xs text-green-600 dark:text-green-400">
-                +{balance.feeCreditSat.toLocaleString()} fee credits
+                +{store.balance.feeCreditSat.toLocaleString()} fee credits
               </p>
             )}
           </div>
@@ -233,24 +204,24 @@ export default function AppLayout({ children }: AppLayoutProps) {
       </nav>
 
       {/* Node Info */}
-      {connectionStatus === 'connected' && nodeInfo && (
+      {connectionStatus === 'connected' && store.nodeInfo && (
         <div className="p-4 border-t border-gray-200 dark:border-gray-800">
           <div className="text-center">
             <p className="text-xs text-gray-500 dark:text-gray-400">Node ID</p>
             <p className="text-xs font-mono text-gray-700 dark:text-gray-300 truncate">
-              {nodeInfo.nodeId ? (process.env.NEXT_PUBLIC_DUMMY_NODE_ID || '02ab3c4d5e6f7890123456789abcdef1234567890abcdef1234567890abcdef12').substring(0, 20) + '...' : 'N/A'}
+              {store.nodeInfo.nodeId ? (process.env.NEXT_PUBLIC_DUMMY_NODE_ID || '02ab3c4d5e6f7890123456789abcdef1234567890abcdef1234567890abcdef12').substring(0, 20) + '...' : 'N/A'}
             </p>
             <div className="flex items-center justify-center gap-4 mt-2">
               <div className="text-center">
                 <p className="text-xs text-gray-500 dark:text-gray-400">Block</p>
                 <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                  {nodeInfo.blockHeight?.toLocaleString() || 'N/A'}
+                  {store.nodeInfo.blockHeight?.toLocaleString() || 'N/A'}
                 </p>
               </div>
               <div className="text-center">
                 <p className="text-xs text-gray-500 dark:text-gray-400">Channels</p>
                 <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                  {nodeInfo.channels?.length || 0}
+                  {store.channels?.length || 0}
                 </p>
               </div>
             </div>

@@ -23,10 +23,10 @@ export const usePhoenixConnection = (config: PhoenixdConfig = DEFAULT_CONFIG) =>
       // Initialize API
       const api = createPhoenixAPI(config);
 
-      // Test connection
-      const pingResponse = await api.ping();
-      if (!pingResponse.success) {
-        throw new Error(pingResponse.error || 'Failed to connect');
+      // Test connection using getinfo instead of ping to avoid extra calls
+      const infoResponse = await api.getInfo();
+      if (!infoResponse.success) {
+        throw new Error(infoResponse.error || 'Failed to connect');
       }
 
       store.setConnectionStatus('connected');
