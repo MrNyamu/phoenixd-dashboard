@@ -106,6 +106,7 @@ export default function NodeManager() {
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [isOnline, setIsOnline] = useState<boolean>(false);
 
   const fetchNodeData = async () => {
     try {
@@ -114,6 +115,7 @@ export default function NodeManager() {
       // Fetch node info
       const info = await phoenixApiCall('/getinfo');
       setNodeInfo(info);
+      setIsOnline(true); // Successfully connected
 
       // Fetch balance
       try {
@@ -134,6 +136,10 @@ export default function NodeManager() {
     } catch (err: any) {
       console.error('Failed to fetch node data:', err);
       setError(`Failed to fetch node data: ${err.message}`);
+      setIsOnline(false); // Failed to connect
+      setNodeInfo(null);
+      setBalance(null);
+      setChannels([]);
     } finally {
       setLoading(false);
     }
@@ -238,12 +244,24 @@ export default function NodeManager() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Node Status</p>
-              <p className="text-2xl font-bold text-green-600 dark:text-green-400 mt-1">
-                {loading ? '...' : nodeInfo ? 'Online' : 'Offline'}
+              <p className={`text-2xl font-bold mt-1 ${
+                loading ? 'text-gray-500 dark:text-gray-400' :
+                isOnline ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
+              }`}>
+                {loading ? 'Checking...' : isOnline ? 'Online' : 'Offline'}
               </p>
             </div>
-            <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center">
-              <Wifi className="w-6 h-6 text-white" />
+            <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${
+              loading ? 'bg-gradient-to-br from-gray-400 to-gray-500' :
+              isOnline ? 'bg-gradient-to-br from-green-500 to-green-600' : 'bg-gradient-to-br from-red-500 to-red-600'
+            }`}>
+              {loading ? (
+                <RefreshCw className="w-6 h-6 text-white animate-spin" />
+              ) : isOnline ? (
+                <Wifi className="w-6 h-6 text-white" />
+              ) : (
+                <AlertCircle className="w-6 h-6 text-white" />
+              )}
             </div>
           </div>
         </div>

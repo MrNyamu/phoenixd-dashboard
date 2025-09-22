@@ -39,16 +39,55 @@ export default function AppLayout({ children }: AppLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState<'disconnected' | 'connecting' | 'connected' | 'error'>('connecting');
   const [error, setError] = useState<string | null>(null);
+  const [balance, setBalance] = useState<{ balanceSat: number; feeCreditSat: number } | null>(null);
+  const [nodeInfo, setNodeInfo] = useState<{ nodeId: string; blockHeight: number; channels: any[] } | null>(null);
   const router = useRouter();
   const pathname = usePathname();
 
   useEffect(() => {
-    // Simulate connection attempt
-    const timer = setTimeout(() => {
-      setConnectionStatus('connected');
-    }, 2000);
+    // Check actual Phoenix connection
+    const checkConnection = async () => {
+      try {
+        setConnectionStatus('connecting');
 
-    return () => clearTimeout(timer);
+        // Fetch node info
+        const infoResponse = await fetch('/api/phoenixd/getinfo');
+        if (infoResponse.ok) {
+          const info = await infoResponse.json();
+          setNodeInfo(info);
+          setConnectionStatus('connected');
+          setError(null);
+
+          // Fetch balance
+          try {
+            const balanceResponse = await fetch('/api/phoenixd/getbalance');
+            if (balanceResponse.ok) {
+              const balanceData = await balanceResponse.json();
+              setBalance(balanceData);
+            }
+          } catch (err) {
+            console.warn('Balance fetch failed:', err);
+          }
+        } else {
+          setConnectionStatus('error');
+          setError('Failed to connect to PhoenixD');
+          setNodeInfo(null);
+          setBalance(null);
+        }
+      } catch (err) {
+        setConnectionStatus('error');
+        setError('PhoenixD is not available');
+        setNodeInfo(null);
+        setBalance(null);
+      }
+    };
+
+    checkConnection();
+
+    // Check connection every 30 seconds
+    const interval = setInterval(checkConnection, 30000);
+
+    return () => clearInterval(interval);
   }, []);
 
   const ConnectionIndicator = () => {
@@ -143,16 +182,18 @@ export default function AppLayout({ children }: AppLayoutProps) {
       </div>
 
       {/* Balance */}
-      {connectionStatus === 'connected' && (
+      {connectionStatus === 'connected' && balance && (
         <div className="p-4 border-b border-gray-200 dark:border-gray-800">
           <div className="text-center">
             <p className="text-sm text-gray-500 dark:text-gray-400">Total Balance</p>
             <p className="text-2xl font-bold text-gray-900 dark:text-white">
-              1,500,000 sats
+              {balance.balanceSat.toLocaleString()} sats
             </p>
-            <p className="text-xs text-green-600 dark:text-green-400">
-              +1,000 fee credits
-            </p>
+            {balance.feeCreditSat > 0 && (
+              <p className="text-xs text-green-600 dark:text-green-400">
+                +{balance.feeCreditSat.toLocaleString()} fee credits
+              </p>
+            )}
           </div>
         </div>
       )}
@@ -191,24 +232,24 @@ export default function AppLayout({ children }: AppLayoutProps) {
       </nav>
 
       {/* Node Info */}
-      {connectionStatus === 'connected' && (
+      {connectionStatus === 'connected' && nodeInfo && (
         <div className="p-4 border-t border-gray-200 dark:border-gray-800">
           <div className="text-center">
             <p className="text-xs text-gray-500 dark:text-gray-400">Node ID</p>
             <p className="text-xs font-mono text-gray-700 dark:text-gray-300 truncate">
-              0298f50dd9ea14b446c...
+              {nodeInfo.nodeId ? nodeInfo.nodeId.substring(0, 20) + '...' : 'N/A'}
             </p>
             <div className="flex items-center justify-center gap-4 mt-2">
               <div className="text-center">
                 <p className="text-xs text-gray-500 dark:text-gray-400">Block</p>
                 <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                  825,000
+                  {nodeInfo.blockHeight?.toLocaleString() || 'N/A'}
                 </p>
               </div>
               <div className="text-center">
                 <p className="text-xs text-gray-500 dark:text-gray-400">Channels</p>
                 <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                  3
+                  {nodeInfo.channels?.length || 0}
                 </p>
               </div>
             </div>
@@ -220,17 +261,11 @@ export default function AppLayout({ children }: AppLayoutProps) {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* Mobile sidebar overlay */}
+      {/* Mobile sidebar */}
       {sidebarOpen && (
-        <>
-          <div
-            className="fixed inset-0 z-40 bg-black bg-opacity-50 lg:hidden"
-            onClick={() => setSidebarOpen(false)}
-          />
-          <div className="fixed inset-y-0 left-0 z-50 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 lg:hidden transition-transform duration-300 ease-in-out">
-            <Sidebar mobile />
-          </div>
-        </>
+        <div className="fixed inset-y-0 left-0 z-50 w-80 max-w-xs bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 lg:hidden transition-transform duration-300 ease-in-out transform overflow-y-auto shadow-xl">
+          <Sidebar mobile />
+        </div>
       )}
 
       {/* Desktop sidebar */}
@@ -241,7 +276,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
       </div>
 
       {/* Main content */}
-      <div className="lg:pl-64">
+      <div className={`lg:pl-64 transition-all duration-300 ${sidebarOpen ? 'lg:opacity-100 opacity-50' : 'opacity-100'}`}>
         {/* Mobile header */}
         <div className="lg:hidden">
           <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900">
@@ -264,6 +299,14 @@ export default function AppLayout({ children }: AppLayoutProps) {
           </div>
         </main>
       </div>
+
+      {/* Overlay to close sidebar on mobile */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 z-40 lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
     </div>
   );
 }
