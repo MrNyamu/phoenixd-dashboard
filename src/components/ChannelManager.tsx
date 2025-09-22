@@ -633,7 +633,7 @@ export default function ChannelManager() {
                   <h4 className="font-semibold text-blue-900 dark:text-blue-100 mb-2">Current Node Info</h4>
                   <div className="text-sm text-blue-800 dark:text-blue-200 space-y-1">
                     <p><strong>Node ID:</strong> {nodeInfo?.nodeId ? (process.env.NEXT_PUBLIC_DUMMY_NODE_ID || '02ab3c4d5e6f7890123456789abcdef1234567890abcdef1234567890abcdef12').substring(0, 20) + '...' : 'Loading...'}</p>
-                    <p><strong>Network:</strong> {nodeInfo?.chain || 'Loading...'}</p>
+                    <p><strong>Network:</strong> {nodeInfo?.chainHash ? (nodeInfo.chainHash.startsWith('6fe28c0ab6f1b372c1a6a246ae63f74f931e8365e15a089c68d6190000000000') ? 'mainnet' : 'testnet') : 'Loading...'}</p>
                     <p><strong>Block Height:</strong> {nodeInfo?.blockHeight?.toLocaleString() || 'Loading...'}</p>
                   </div>
                 </div>

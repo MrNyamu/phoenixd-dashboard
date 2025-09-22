@@ -11,17 +11,8 @@ const nextConfig: NextConfig = {
 
   // Turbopack configuration
   turbopack: {
-    root: __dirname,
     resolveAlias: {
       '@vercel/turbopack-next/internal/font/google/font': 'next/dist/compiled/@next/font/dist/google/index.js',
-    },
-    rules: {
-      '*.{woff,woff2,eot,ttf,otf}': {
-        loaders: ['file-loader'],
-        options: {
-          name: '[name].[ext]',
-        },
-      },
     },
   },
 

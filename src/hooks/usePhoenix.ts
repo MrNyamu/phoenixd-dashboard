@@ -206,16 +206,13 @@ export const usePhoenixData = () => {
           if (payment.isPaid) {
             const transaction = {
               paymentHash: payment.paymentHash,
-              paymentPreimage: payment.preimage,
-              amountMsat: payment.receivedSat * 1000,
+              serialized: payment.invoice || '',
               description: payment.description || '',
-              createdAt: Math.floor(payment.createdAt / 1000), // Convert to seconds
-              status: 'completed' as const,
-              type: 'incoming_payment' as const,
-              invoice: payment.invoice,
-              expiresAt: payment.expiresAt ? Math.floor(payment.expiresAt / 1000) : undefined,
-              completedAt: payment.completedAt ? Math.floor(payment.completedAt / 1000) : undefined,
-              fees: payment.fees || 0,
+              amountMsat: payment.receivedSat * 1000,
+              expiresAt: payment.expiresAt ? Math.floor(payment.expiresAt / 1000) : Date.now() + 3600,
+              createdAt: Math.floor(payment.createdAt / 1000),
+              receivedAt: payment.completedAt ? Math.floor(payment.completedAt / 1000) : undefined,
+              status: 'PAID' as const,
             };
             store.addInvoice(transaction);
           }

@@ -16,6 +16,25 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "PhoenixD Lightning Client",
   description: "Modern Lightning Network management interface for PhoenixD",
+  viewport: {
+    width: "device-width",
+    initialScale: 1,
+    maximumScale: 1,
+    userScalable: false,
+    viewportFit: "cover"
+  },
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#111827" }
+  ],
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "PhoenixD"
+  },
+  formatDetection: {
+    telephone: false
+  }
 };
 
 export default function RootLayout({
@@ -26,7 +45,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="h-full">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased h-full bg-gray-50 dark:bg-gray-900`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased h-full bg-gray-50 dark:bg-gray-900 mobile-text mobile-scroll`}
       >
         <AppLayout>
           {children}

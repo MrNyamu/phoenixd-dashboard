@@ -1,0 +1,130 @@
+/* Mobile-first responsive utilities */
+
+/* Touch targets for better mobile interaction */
+.touch-manipulation {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Improved scroll behavior on mobile */
+.mobile-scroll {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+/* Better text rendering on mobile */
+.mobile-text {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Safe area padding for devices with notches */
+.safe-area-padding {
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+
+/* Galaxy Z Fold specific optimizations */
+@media (max-width: 372px) {
+  /* Ensure minimum touch target size */
+  button,
+  [role="button"],
+  input[type="button"],
+  input[type="submit"],
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Adjust text sizes for very narrow screens */
+  .text-xs { font-size: 0.6rem; }
+  .text-sm { font-size: 0.75rem; }
+  .text-base { font-size: 0.875rem; }
+  .text-lg { font-size: 1rem; }
+  .text-xl { font-size: 1.125rem; }
+  .text-2xl { font-size: 1.25rem; }
+
+  /* Reduce padding on very small screens */
+  .mobile-p-reduce {
+    padding: 0.5rem !important;
+  }
+
+  /* Stack flex items on narrow screens */
+  .mobile-stack {
+    flex-direction: column !important;
+  }
+
+  /* Hide non-essential elements on very narrow screens */
+  .hide-on-narrow {
+    display: none !important;
+  }
+}
+
+/* Galaxy Z Fold open and similar devices */
+@media (min-width: 373px) and (max-width: 512px) {
+  /* Optimize for wider but still compact screens */
+  .grid-cols-auto-fit {
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  }
+}
+
+/* Improved focus states for keyboard navigation */
+.focus-visible:focus-visible {
+  outline: 2px solid theme('colors.blue.500');
+  outline-offset: 2px;
+}
+
+/* Better button hover states on touch devices */
+@media (hover: hover) {
+  .hover-scale:hover {
+    transform: scale(1.02);
+  }
+}
+
+/* Disable hover effects on touch devices */
+@media (hover: none) {
+  .hover-scale:hover {
+    transform: none;
+  }
+}
+
+/* Custom scrollbar for better mobile experience */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(156, 163, 175, 0.5);
+  border-radius: 2px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(156, 163, 175, 0.7);
+}
+
+/* Animation performance optimizations */
+.will-change-transform {
+  will-change: transform;
+}
+
+.will-change-opacity {
+  will-change: opacity;
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

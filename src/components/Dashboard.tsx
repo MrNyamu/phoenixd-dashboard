@@ -212,7 +212,7 @@ const Dashboard = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay, duration: 0.5 }}
         whileHover={{ scale: 1.02 }}
-        className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700"
+        className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 sm:p-6 border border-gray-200 dark:border-gray-700"
       >
         <div className="flex items-center justify-between">
           <div className="flex-1">
@@ -221,7 +221,7 @@ const Dashboard = () => {
               key={value}
               initial={{ scale: 1.1 }}
               animate={{ scale: 1 }}
-              className="text-2xl font-bold text-gray-900 dark:text-white mt-1"
+              className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mt-1 break-all"
             >
               {value}
             </motion.p>
@@ -243,7 +243,7 @@ const Dashboard = () => {
             )}
           </div>
           <div className={cn(
-            'w-12 h-12 rounded-lg bg-gradient-to-br flex items-center justify-center',
+            'w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-gradient-to-br flex items-center justify-center',
             colorConfig[color]
           )}>
             <Icon className="w-6 h-6 text-white" />
@@ -282,34 +282,34 @@ const Dashboard = () => {
         className="flex items-center justify-between"
       >
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-1">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
+          <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 mt-1">
             Monitor your Lightning node activity and manage payments
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-1 sm:gap-3">
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => setBalanceVisible(!balanceVisible)}
-            className="p-2 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+            className="p-1.5 sm:p-2 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 touch-manipulation"
           >
-            {balanceVisible ? <Eye className="w-5 h-5" /> : <EyeOff className="w-5 h-5" />}
+            {balanceVisible ? <Eye className="w-4 h-4 sm:w-5 sm:h-5" /> : <EyeOff className="w-4 h-4 sm:w-5 sm:h-5" />}
           </motion.button>
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={handleRefresh}
             disabled={refreshing}
-            className="flex items-center gap-2 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 disabled:opacity-50"
+            className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-4 py-1.5 sm:py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 disabled:opacity-50 touch-manipulation text-xs sm:text-base"
           >
             <motion.div
               animate={refreshing ? { rotate: 360 } : { rotate: 0 }}
               transition={{ duration: 1, repeat: refreshing ? Infinity : 0 }}
             >
-              <RefreshCw className="w-4 h-4" />
+              <RefreshCw className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </motion.div>
-            Refresh
+            <span className="hidden sm:inline">Refresh</span>
           </motion.button>
         </div>
       </motion.div>
@@ -356,7 +356,7 @@ const Dashboard = () => {
       {activeTab === 'overview' && (
         <div className="space-y-6">
           {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         <StatCard
           title="Total Balance"
           value={balanceVisible ? formatSats(balance?.balanceMsat || 0) : '••••••'}
@@ -418,10 +418,10 @@ const Dashboard = () => {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => setShowQuickInvoice(!showQuickInvoice)}
-              className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-500 to-blue-500 text-white rounded-lg hover:from-green-600 hover:to-blue-600"
+              className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-gradient-to-r from-green-500 to-blue-500 text-white rounded-lg hover:from-green-600 hover:to-blue-600 text-xs sm:text-base"
             >
-              <Plus className="w-4 h-4" />
-              Create Invoice
+              <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+              <span>Create Invoice</span>
             </motion.button>
           </div>
 
@@ -460,27 +460,27 @@ const Dashboard = () => {
                     />
                   </div>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex flex-col sm:flex-row gap-2">
                   <motion.button
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={handleCreateQuickInvoice}
                     disabled={isCreatingInvoice}
-                    className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-500 to-blue-500 text-white rounded-lg hover:from-green-600 hover:to-blue-600 disabled:opacity-50"
+                    className="flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 bg-gradient-to-r from-green-500 to-blue-500 text-white rounded-lg hover:from-green-600 hover:to-blue-600 disabled:opacity-50 text-sm sm:text-base"
                   >
                     {isCreatingInvoice ? (
                       <>
                         <motion.div
                           animate={{ rotate: 360 }}
                           transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-                          className="w-4 h-4 border-2 border-white border-t-transparent rounded-full"
+                          className="w-3.5 h-3.5 sm:w-4 sm:h-4 border-2 border-white border-t-transparent rounded-full"
                         />
-                        Creating...
+                        <span>Creating...</span>
                       </>
                     ) : (
                       <>
-                        <QrCode className="w-4 h-4" />
-                        Generate with QR
+                        <QrCode className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                        <span>Generate with QR</span>
                       </>
                     )}
                   </motion.button>
@@ -488,7 +488,7 @@ const Dashboard = () => {
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={() => setShowQuickInvoice(false)}
-                    className="px-4 py-2 text-gray-600 dark:text-gray-400 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700"
+                    className="px-3 sm:px-4 py-2 text-gray-600 dark:text-gray-400 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 text-sm sm:text-base"
                   >
                     Cancel
                   </motion.button>
