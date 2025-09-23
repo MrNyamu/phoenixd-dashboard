@@ -35,15 +35,22 @@ export const usePhoenixConnection = (config: PhoenixdConfig = DEFAULT_CONFIG) =>
       // Setup WebSocket for real-time updates
       wsRef.current = api.createWebSocket(
         (data) => {
-          console.log('📡 WebSocket data:', data);
+          console.log('📡 WebSocket data received:', data);
           // eslint-disable-next-line react-hooks/exhaustive-deps
           handleRealtimeUpdate(data);
+          store.setError(null); // Clear any previous errors on successful data
         },
         (error) => {
           console.error('❌ WebSocket error:', error);
-          store.setError('WebSocket connection failed');
+          store.setError('WebSocket connection failed - check your PhoenixD configuration');
         }
       );
+
+      if (!wsRef.current) {
+        console.log('⚠️ WebSocket connection failed, falling back to polling');
+      } else {
+        console.log('📡 WebSocket connection established');
+      }
 
       return api;
     } catch (error: any) {

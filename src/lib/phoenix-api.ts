@@ -191,16 +191,20 @@ class PhoenixAPI {
   // WebSocket for real-time updates
   createWebSocket(onMessage: (data: any) => void, onError?: (error: Event) => void): WebSocket | null {
     try {
-      const wsUrl = this.config.url.replace(/^http/, 'ws') + '/ws';
+      // Create WebSocket URL with proper authentication
+      const wsUrl = this.buildWebSocketUrl();
+      console.log('🔌 Connecting to WebSocket:', wsUrl);
+
       const ws = new WebSocket(wsUrl);
 
       ws.onopen = () => {
-        console.log('🔌 WebSocket connected to PhoenixD');
+        console.log('✅ WebSocket connected to PhoenixD');
       };
 
       ws.onmessage = (event) => {
         try {
           const data = JSON.parse(event.data);
+          console.log('📡 WebSocket data received:', data);
           onMessage(data);
         } catch (error) {
           console.error('❌ Failed to parse WebSocket message:', error);
@@ -212,20 +216,87 @@ class PhoenixAPI {
         onError?.(error);
       };
 
-      ws.onclose = () => {
-        console.log('🔌 WebSocket disconnected from PhoenixD');
+      ws.onclose = (event) => {
+        console.log('🔌 WebSocket disconnected from PhoenixD', event.code, event.reason);
+        if (event.code !== 1000) {
+          console.warn('⚠️ WebSocket closed unexpectedly, code:', event.code);
+        }
       };
 
       return ws;
     } catch (error) {
       console.error('❌ Failed to create WebSocket:', error);
+      onError?.(error as Event);
       return null;
     }
+  }
+
+  private buildWebSocketUrl(): string {
+    // Convert HTTP URL to WebSocket URL
+    let wsUrl = this.config.url.replace(/^http/, 'ws');
+
+    // Add WebSocket endpoint path
+    if (!wsUrl.endsWith('/')) {
+      wsUrl += '/';
+    }
+    wsUrl += 'ws';
+
+    // Add authentication parameters
+    const url = new URL(wsUrl);
+
+    // Use basic auth in URL for WebSocket authentication
+    if (this.config.password) {
+      url.username = 'phoenix';
+      url.password = this.config.password;
+    }
+
+    // Add any WebSocket-specific query parameters
+    const wsSecret = process.env.PHOENIXD_WEBSOCKET_SECRET || process.env.PHOENIXD_WEBHOOK_SECRET;
+    if (wsSecret) {
+      url.searchParams.set('secret', wsSecret);
+    }
+
+    return url.toString();
   }
 
   // Health check
   async ping(): Promise<ApiResponse<{ pong: string }>> {
     return this.request<{ pong: string }>('get', '/ping');
+  }
+
+  // Test WebSocket connection
+  testWebSocketConnection(): Promise<boolean> {
+    return new Promise((resolve) => {
+      try {
+        const ws = this.createWebSocket(
+          () => {
+            console.log('✅ WebSocket test successful');
+            ws?.close();
+            resolve(true);
+          },
+          () => {
+            console.log('❌ WebSocket test failed');
+            resolve(false);
+          }
+        );
+
+        if (!ws) {
+          resolve(false);
+          return;
+        }
+
+        // Timeout after 5 seconds
+        setTimeout(() => {
+          if (ws.readyState !== WebSocket.OPEN) {
+            ws.close();
+            resolve(false);
+          }
+        }, 5000);
+      } catch (error) {
+        console.error('❌ WebSocket test error:', error);
+        resolve(false);
+      }
+    });
   }
 
   // Network utilities

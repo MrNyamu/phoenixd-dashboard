@@ -21,8 +21,11 @@ import {
   Wallet,
   Link,
   Server,
-  CreditCard
+  CreditCard,
+  HelpCircle
 } from 'lucide-react';
+import NetworkIndicator from './NetworkIndicator';
+import NetworkWarningBanner from './NetworkWarningBanner';
 
 const navigation = [
   { name: 'Dashboard', href: '/', icon: Home },
@@ -31,6 +34,7 @@ const navigation = [
   { name: 'Node Manager', href: '/node', icon: Server },
   { name: 'Channels', href: '/channels', icon: Zap },
   { name: 'Lightning Address', href: '/lightning-address', icon: Mail },
+  { name: 'Help', href: '/help', icon: HelpCircle },
   { name: 'Settings', href: '/settings', icon: Settings },
 ];
 
@@ -203,15 +207,22 @@ export default function AppLayout({ children }: AppLayoutProps) {
         })}
       </nav>
 
+      {/* Network Indicator */}
+      <div className="p-3 sm:p-4 border-t border-gray-200 dark:border-gray-800">
+        <NetworkIndicator size="sm" className="w-full" />
+      </div>
+
       {/* Node Info */}
       {connectionStatus === 'connected' && store.nodeInfo && (
         <div className="p-3 sm:p-4 border-t border-gray-200 dark:border-gray-800">
-          <div className="text-center">
-            <p className="text-xs text-gray-500 dark:text-gray-400">Node ID</p>
-            <p className="text-xs font-mono text-gray-700 dark:text-gray-300 truncate break-all">
-              {store.nodeInfo.nodeId ? (process.env.NEXT_PUBLIC_DUMMY_NODE_ID || '02ab3c4d5e6f7890123456789abcdef1234567890abcdef1234567890abcdef12').substring(0, 20) + '...' : 'N/A'}
-            </p>
-            <div className="flex items-center justify-center gap-4 mt-2">
+          <div className="space-y-3">
+            <div className="text-center">
+              <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Node ID</p>
+              <p className="text-xs font-mono text-gray-700 dark:text-gray-300 truncate px-2">
+                {store.nodeInfo.nodeId ? (process.env.NEXT_PUBLIC_DUMMY_NODE_ID || '02ab3c4d5e6f7890123456789abcdef1234567890abcdef1234567890abcdef12').substring(0, 16) + '...' : 'N/A'}
+              </p>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
               <div className="text-center">
                 <p className="text-xs text-gray-500 dark:text-gray-400">Block</p>
                 <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">
@@ -233,6 +244,8 @@ export default function AppLayout({ children }: AppLayoutProps) {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      {/* Network Warning Banner */}
+      <NetworkWarningBanner />
       {/* Mobile sidebar */}
       {sidebarOpen && (
         <div className="fixed inset-y-0 left-0 z-50 w-full max-w-sm bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 lg:hidden transition-transform duration-300 ease-in-out transform overflow-y-auto shadow-xl">
@@ -259,6 +272,9 @@ export default function AppLayout({ children }: AppLayoutProps) {
               <Menu className="w-6 h-6" />
             </button>
             <div className="flex items-center gap-1 sm:gap-2">
+              {/* Network indicator for mobile */}
+              <NetworkIndicator size="sm" showWarning={false} />
+
               {/* Compact connection indicator for mobile */}
               <div className={`flex items-center gap-1 px-2 py-1 rounded-lg transition-all duration-200 ${connectionStatus === 'connected' ? 'bg-green-50 dark:bg-green-900/20' : connectionStatus === 'error' ? 'bg-red-50 dark:bg-red-900/20' : 'bg-gray-50 dark:bg-gray-900/20'}`}>
                 <div className={connectionStatus === 'connecting' ? 'animate-spin' : ''}>

@@ -26,6 +26,7 @@ import {
 import { usePhoenixStore } from '@/stores/usePhoenixStore';
 import { usePhoenixConnection, usePhoenixData } from '@/hooks/usePhoenix';
 import { formatSats, copyToClipboard, cn, animationVariants } from '@/lib/utils';
+import { getNetworkFromChainHash, formatNetworkName } from '@/lib/network';
 import QRCodeGenerator from './QRCodeGenerator';
 
 interface ChannelData {
@@ -297,21 +298,21 @@ export default function ChannelManager() {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 shadow-lg"
+      className="bg-white dark:bg-gray-800 rounded-xl p-4 sm:p-6 border border-gray-200 dark:border-gray-700 shadow-lg"
     >
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 mb-4">
+        <div className="flex items-center gap-2 sm:gap-3">
           <div className={cn(
-            'w-3 h-3 rounded-full',
+            'w-3 h-3 rounded-full flex-shrink-0',
             channel.state === 'NORMAL' ? 'bg-green-500' :
             channel.state === 'OFFLINE' ? 'bg-red-500' :
             channel.state === 'SYNCING' ? 'bg-yellow-500' : 'bg-gray-500'
           )} />
-          <div>
-            <h3 className="font-semibold text-gray-900 dark:text-white">
+          <div className="min-w-0">
+            <h3 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white truncate">
               Channel {channel.channelId.slice(0, 8)}...
             </h3>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
+            <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
               {channel.state} • {channel.isActive ? 'Active' : 'Inactive'}
             </p>
           </div>
@@ -393,38 +394,38 @@ export default function ChannelManager() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Channel Manager</h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-1">
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white">Channel Manager</h1>
+          <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 mt-1">
             Manage Lightning channels and wallet funding
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
           <button
             onClick={() => setShowAdvanced(!showAdvanced)}
             className={cn(
-              'flex items-center gap-2 px-4 py-2 rounded-lg border transition-colors',
+              'flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 rounded-lg border transition-colors text-sm sm:text-base',
               showAdvanced
                 ? 'bg-blue-50 border-blue-200 text-blue-700 dark:bg-blue-900/20 dark:border-blue-800 dark:text-blue-400'
                 : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700'
             )}
           >
-            <Settings className="w-4 h-4" />
-            {showAdvanced ? 'Hide' : 'Show'} Advanced
+            <Settings className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+            <span>{showAdvanced ? 'Hide' : 'Show'} Advanced</span>
           </button>
           <button
             onClick={fetchChannels}
             disabled={refreshing}
-            className="flex items-center gap-2 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 disabled:opacity-50"
+            className="flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 disabled:opacity-50 text-sm sm:text-base"
           >
             <motion.div
               animate={refreshing ? { rotate: 360 } : { rotate: 0 }}
               transition={{ duration: 1, repeat: refreshing ? Infinity : 0 }}
             >
-              <RefreshCw className="w-4 h-4" />
+              <RefreshCw className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </motion.div>
-            Refresh
+            <span>Refresh</span>
           </button>
         </div>
       </div>
@@ -593,15 +594,15 @@ export default function ChannelManager() {
           className="space-y-6"
         >
           {/* Node Configuration */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Node Configuration</h3>
+          <div className="bg-white dark:bg-gray-800 rounded-xl p-4 sm:p-6 border border-gray-200 dark:border-gray-700">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 mb-4">
+              <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">Node Configuration</h3>
               <button
                 onClick={() => setShowNodeConfig(!showNodeConfig)}
-                className="flex items-center gap-2 px-3 py-1 bg-blue-100 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 rounded-lg text-sm hover:bg-blue-200 dark:hover:bg-blue-900/40"
+                className="flex items-center justify-center gap-1.5 sm:gap-2 px-3 py-2 bg-blue-100 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 rounded-lg text-sm hover:bg-blue-200 dark:hover:bg-blue-900/40 w-full sm:w-auto"
               >
-                <Settings className="w-4 h-4" />
-                {showNodeConfig ? 'Hide' : 'Configure'}
+                <Settings className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                <span>{showNodeConfig ? 'Hide' : 'Configure'}</span>
               </button>
             </div>
 
@@ -633,7 +634,12 @@ export default function ChannelManager() {
                   <h4 className="font-semibold text-blue-900 dark:text-blue-100 mb-2">Current Node Info</h4>
                   <div className="text-sm text-blue-800 dark:text-blue-200 space-y-1">
                     <p><strong>Node ID:</strong> {nodeInfo?.nodeId ? (process.env.NEXT_PUBLIC_DUMMY_NODE_ID || '02ab3c4d5e6f7890123456789abcdef1234567890abcdef1234567890abcdef12').substring(0, 20) + '...' : 'Loading...'}</p>
-                    <p><strong>Network:</strong> {nodeInfo?.chainHash ? (nodeInfo.chainHash.startsWith('6fe28c0ab6f1b372c1a6a246ae63f74f931e8365e15a089c68d6190000000000') ? 'mainnet' : 'testnet') : 'Loading...'}</p>
+                    <p><strong>Network:</strong> {nodeInfo?.chainHash ? (
+                      (() => {
+                        const network = getNetworkFromChainHash(nodeInfo.chainHash);
+                        return network ? formatNetworkName(network) : 'Unknown Network';
+                      })()
+                    ) : 'Loading...'}</p>
                     <p><strong>Block Height:</strong> {nodeInfo?.blockHeight?.toLocaleString() || 'Loading...'}</p>
                   </div>
                 </div>
@@ -642,15 +648,15 @@ export default function ChannelManager() {
           </div>
 
           {/* Channel Creation */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Create Channel</h3>
+          <div className="bg-white dark:bg-gray-800 rounded-xl p-4 sm:p-6 border border-gray-200 dark:border-gray-700">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 mb-4">
+              <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">Create Channel</h3>
               <button
                 onClick={() => setShowChannelCreation(!showChannelCreation)}
-                className="flex items-center gap-2 px-3 py-1 bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-400 rounded-lg text-sm hover:bg-green-200 dark:hover:bg-green-900/40"
+                className="flex items-center justify-center gap-1.5 sm:gap-2 px-3 py-2 bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-400 rounded-lg text-sm hover:bg-green-200 dark:hover:bg-green-900/40 w-full sm:w-auto"
               >
-                <Plus className="w-4 h-4" />
-                {showChannelCreation ? 'Hide' : 'Open Channel'}
+                <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                <span>{showChannelCreation ? 'Hide' : 'Open Channel'}</span>
               </button>
             </div>
 

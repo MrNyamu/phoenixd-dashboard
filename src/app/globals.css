@@ -55,3 +55,18 @@ input[type="submit"],
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
 }
+
+/* Consistent responsive spacing */
+@media (max-width: 640px) {
+  .responsive-padding {
+    padding: 1rem !important;
+  }
+
+  .responsive-gap {
+    gap: 0.5rem !important;
+  }
+
+  .responsive-text {
+    font-size: 0.875rem !important;
+  }
+}

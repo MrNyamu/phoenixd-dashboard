@@ -199,6 +199,7 @@ export const parseInvoiceAmount = (invoice: string): number | null => {
   }
 };
 
+// Deprecated: Use getNetworkClasses from @/lib/network instead
 export const getNetworkColor = (network: string): string => {
   switch (network) {
     case 'mainnet':
